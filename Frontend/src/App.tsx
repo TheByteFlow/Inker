@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Button } from "./components/ui/button";
+import Login from "./components/auth/Login";
 
 function App() {
   useEffect(() => {
@@ -16,11 +16,7 @@ function App() {
   }, []);
   return (
     <>
-    <div className="pl-3">
-
-      <Button>Click me</Button>
-    </div>
-      INKER
+      <Login />
     </>
   );
 }
