@@ -8,3 +8,4 @@ export async function connectDb(){
         console.log('Mongo Error, ',error)
     }
 }
+
