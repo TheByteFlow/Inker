@@ -75,7 +75,8 @@ curl -X GET http://localhost:3000
 
 1. **Create your feature branch**
    ```bash
- git checkout -b test origin/test   ```
+   git checkout -b test origin/test  
+   ```
 
 2. **Keep your branch updated**
    ```bash
