@@ -5,6 +5,8 @@ import { hashPassword } from "../../utils/hashPassword";
 import generateOtp from "../../utils/generateOtp";
 import { sendOtpEmail } from "../../utils/sendEmail";
 import { redisClient } from "../../configs/redis.config";
+import bcrypt from 'bcrypt';
+import { generateAccessToken, generateRefreshToken } from '../../utils/jwt';
 
 
 //!   Implementation for Auth Service
@@ -38,5 +40,27 @@ export class AuthService implements IAuthService {
           }
 
         return user.email
+    }
+
+    async signin(email: string, password: string): Promise<{ accessToken: string, refreshToken: string }> {
+
+        const user = await this._userRepository.findByEmail(email);
+
+        if(!user){
+            throw new Error("User not found");
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password as string);
+
+        if(!isMatch){
+            throw new Error("Incorrect password");
+        }
+
+        const payload = { id: user._id, email: user.email };
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        return { accessToken, refreshToken };
     }
 }

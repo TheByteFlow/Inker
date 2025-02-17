@@ -18,4 +18,23 @@ export class AuthController implements IAuthController{
             next(err)
         }
     }
+
+    async signin(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try{
+            const { email, password } = req.body;
+
+            const tokens = await this._authService.signin(email, password);
+
+            res.cookie("refreshToken", tokens.refreshToken, {
+                httpOnly: true,
+                secure: false,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                sameSite: "strict"
+            });
+
+            res.status(200).json({accessToken: tokens.accessToken});
+        }catch(err){
+            next(err)
+        }
+    }
 }
