@@ -23,6 +23,7 @@ jobs:
       - name: Install dependencies (for all workspaces)
         run: npm ci
 
+
       - name: Run ESLint (Frontend)
         run: npm run lint --workspace=frontend -- --max-warnings=0
 
