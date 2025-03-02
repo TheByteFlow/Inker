@@ -1,4 +1,4 @@
-import { useTheme } from "../../common/theme-provider"
+import { useTheme } from "../common/theme-provider"
 import LightLogo from '@/assets/Logo Light.svg'
 import DarkLogo from '@/assets/Logo Dark.svg'
 

@@ -22,7 +22,7 @@ const signinSchema = z
   .strict()
   .refine((data) => data.email || data.username, {
     message: "Either email or username is required",
-    path: ["email"], // or ["username"], this just helps indicate the error location
+    path: ["email"], 
   });
 
 export default signinSchema;

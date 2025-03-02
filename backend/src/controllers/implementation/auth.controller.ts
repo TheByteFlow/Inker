@@ -44,7 +44,6 @@ export class AuthController implements IAuthController {
   ): Promise<void> {
     try {
       const { otp, email } = req.body;
-
       const verificationResponse = await this._authService.verifyOtp(
         otp,
         email

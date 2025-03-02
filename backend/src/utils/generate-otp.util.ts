@@ -1,7 +1,7 @@
-
-const generateOtp = () => {
-    const otp = Math.floor(100000 + Math.random() * 999999) 
-    return otp
+export default function otpGenerator() {
+  let otp = "";
+  for (let i = 0; i < 6; i++) {
+    otp += Math.floor(Math.random() * 10);
+  }
+  return otp;
 }
-
-export default generateOtp

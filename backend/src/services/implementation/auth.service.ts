@@ -14,6 +14,7 @@ import { HttpResponse } from "@/constants/response-message.constant";
 import { generateUniqueUsername } from "@/utils/generate-uniq-username";
 import { IUser } from "shared/types";
 import { IUserModel } from "@/models/implementation/user.model";
+import { log } from "console";
 
 //!   Implementation for Auth Service
 export class AuthService implements IAuthService {
@@ -84,14 +85,13 @@ export class AuthService implements IAuthService {
   ): Promise<{ status: number; message: string }> {
     //get the stored data from redis
     const storedDataString = await redisClient.get(email);
-    console.log(storedDataString);
     if (!storedDataString) {
       throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.OTP_NOT_FOUND);
     }
-
+    
     //parsed from string to object
     const storedData = JSON.parse(storedDataString);
-
+    
     //validated the otp
     if (storedData.otp !== otp)
       throw createHttpError(HttpStatus.BAD_REQUEST, HttpResponse.OTP_INCORRECT);
@@ -109,6 +109,7 @@ export class AuthService implements IAuthService {
 
     //user creation
     const createdUser = await this._userRepository.create(user as IUserModel);
+    
     if (!createdUser)
       throw createHttpError(
         HttpStatus.CONFLICT,
