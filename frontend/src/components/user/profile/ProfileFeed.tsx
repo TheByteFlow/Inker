@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
 import BlogCard from "../common/BlogCard";
-import { ArrowBigUp,ArrowBigDown } from "lucide-react";
+import { ArrowBigUp,ArrowBigDown, EllipsisVertical } from "lucide-react";
 import { Link } from "react-router-dom";
 const TAB_OPTIONS = ["Posts", "Archieve", "Saved"] as const;
-const dummyPosts = [
+export const dummyPosts = [
   {
     title: "Mastering JavaScript Closures",
     tags: ["javascript", "functional-programming", "advanced"],
@@ -88,8 +88,11 @@ const ProfileFeed: FC = () => {
           dummyPosts.map((post, index) => (
             <div
               key={index}
-              className="p-2 m-1 border-2 rounded-lg max-w-[300px] flex flex-col justify-between"
+              className="p-2 m-1 border-2 rounded-lg max-w-[300px] flex flex-col justify-between relative"
             > 
+              <button>
+          <EllipsisVertical className="rounded-xl hover:cursor-pointer absolute right-2 top-2"/>
+        </button>
              <Link to={`/blog/${index}`}>
                 <BlogCard post={post} />
               </Link>  

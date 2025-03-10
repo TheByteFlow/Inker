@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { EllipsisVertical } from "lucide-react";
 
 interface BlogCardProps {
   post: {
@@ -14,18 +13,12 @@ interface BlogCardProps {
 const BlogCard: FC<BlogCardProps> = ({ post }) => {
   return (
     <div className="max-w-[400px] w-full rounded-lg justify-items-stretch">
-      <div className="flex justify-between ">
-      <h2 className="text-lg font-bold text-x dark:text-white text-gray-800 w-[80%] hover:cursor-pointer line-clamp-2">
-  {post.title}
-</h2>
-
-        <button>
-          <EllipsisVertical className="rounded-xl hover:cursor-pointer"/>
-        </button>
-      </div>
+        <h2 className="text-lg font-bold text-x dark:text-white text-gray-800 w-[80%] hover:cursor-pointer line-clamp-2">
+          {post.title}
+        </h2>
 
       <div className="flex flex-wrap gap-2 mt-2">
-        {post.tags.map((tag, index) => (
+        {post.tags.map((tag, index) => (  
           <span
             key={index}
             className="px-2 py-[1px] text-xs border dark:border-gray-700 rounded-md text-gray-400  hover:cursor-pointer"
@@ -34,7 +27,6 @@ const BlogCard: FC<BlogCardProps> = ({ post }) => {
           </span>
         ))}
       </div>
-
 
       <div className="mt-3">
         <img

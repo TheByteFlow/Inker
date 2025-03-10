@@ -9,6 +9,7 @@ import AddBlog from '@/components/user/blogpost/index'
 import OtpForm from "@/pages/auth/OtpForm";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { env } from "@/config/env";
+import Feed from "@/pages/profile/Feed";
 
 
 export const router = createBrowserRouter([
@@ -17,7 +18,7 @@ export const router = createBrowserRouter([
       path: "/",
       element:<AppLayout />,
       children: [
-        { path: "home" , element: <div> Feeds </div>},
+        { path: "home" , element: <div> <Feed/> </div>},
         { path: "explore" , element: <div> Explore </div>},
         { path: "activity" , element: <div> Activity </div>},
         { path: "profile", element: <Profile /> },
