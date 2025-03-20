@@ -4,7 +4,7 @@ import { createHttpError } from "@/utils/http-error.util";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response-message.constant";
 import { IUserModel } from "@/models/implementation/user.model";
-import { nanoid } from "nanoid";
+import { generateNanoId } from "@/utils/generate-nanoid";
 import { JwtPayload } from "jsonwebtoken";
 import {
   comparePassword,
@@ -124,7 +124,7 @@ export class AuthService implements IAuthService {
     if (!isExist) {
       throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
     }
-    const token = nanoid();
+    const token = generateNanoId();
 
     const storeOnReddis = await redisClient.setEx(token, 300, isExist.email);
 

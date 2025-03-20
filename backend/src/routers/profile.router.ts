@@ -5,6 +5,7 @@ import { ProfileService } from "@/services/implementation/profile.service";
 import { ProfileController } from "@/controllers/implementation/profile.controller";
 import { validate } from "@/middlewares/validate.middleware";
 import { editUsernameSchema, updateProfileSchema } from "@/schema";
+import { uploadMiddleware } from "@/middlewares";
 
 
 const router = Router();
@@ -33,9 +34,16 @@ router.put(
 );
 
 router.patch(
-  '/:userId',
+  '/change-email/:userId',
   verifyToken('user'),
   profileController.updateEmail.bind(profileController)
+)
+
+router.patch(
+  "/change-profile-picture",
+  uploadMiddleware("file"),
+  verifyToken("user"),
+  profileController.changeProfilePicture.bind(profileController)
 )
 
 

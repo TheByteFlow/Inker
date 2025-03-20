@@ -19,6 +19,8 @@ export interface IUserRepository {
 
   updateUserProfile(id: string, updateData: Partial<IUserModel>): Promise<IUserModel | null>;
 
-  updateEmail(id: string, email: string): Promise<IUserModel | null>
+  updateEmail(id: string, email: string): Promise<IUserModel | null>;
+
+  updateProfilePicture(id: string, profilePicture: string): Promise<void>;
 
 }

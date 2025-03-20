@@ -66,4 +66,17 @@ export class ProfileController implements IProfileController {
     }
   }
 
+  async changeProfilePicture(req: Request, res: Response, next: NextFunction) {
+    try{
+      const { userId } = req.body;
+      const file = req.file as Express.Multer.File;
+
+      await this._profileService.updateProfilePicture(userId, file);
+
+      res.status(HttpStatus.OK).json({ message: HttpResponse.PROFILE_PICTURE_CHANGED});
+    }catch(error) {
+      next(error)
+    }
+  }
+
 }

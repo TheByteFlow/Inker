@@ -90,4 +90,13 @@ export class UserRepository extends BaseRepository<IUserModel> implements IUserR
       throw new Error("error while updating email")
     }
   }
+
+  async updateProfilePicture(id: string, profilePicture: string): Promise<void> {
+      try{
+        await this.findByIdAndUpdate(toObjectId(id), { $set: { profilePicture }})
+      }catch (error) {
+        console.log(error)
+        throw new Error("error while updating profile picture")
+      }
+  }
 }

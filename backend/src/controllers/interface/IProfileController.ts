@@ -10,4 +10,8 @@ export interface IProfileController {
     editUsername(req: Request, res: Response, next: NextFunction): Promise<void>
 
     updateProfile(req: Request, res: Response, next: NextFunction): Promise<void>
+
+    updateEmail(req: Request, res: Response, next: NextFunction): Promise<void>
+
+    changeProfilePicture(req: Request, res: Response, next: NextFunction): Promise<void>
 }

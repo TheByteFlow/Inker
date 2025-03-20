@@ -1,9 +1,11 @@
 import { IUserRepository } from "@/repositories/interface/IUserRepository";
 import { IProfileService } from "../interface/IProfileService";
-import { createHttpError, checkEmailExistence } from "@/utils";
+import { createHttpError, checkEmailExistence, uploadToCloudinary } from "@/utils";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response-message.constant";
 import { IUserModel } from "@/models/implementation/user.model";
+import { generateNanoId } from "@/utils/generate-nanoid";
+import { deleteFromCloudinary, getPublicIdFromUrl, isCloudinaryUrl } from "@/utils/cloudinary.util";
 
 //!   Implementation for Profile Service
 export class ProfileService implements IProfileService {
@@ -70,6 +72,28 @@ export class ProfileService implements IProfileService {
     }
 
     return updateEmail;
+  }
+
+  async updateProfilePicture(userId: string, file: Express.Multer.File): Promise<void> {
+
+    const isExist = await this._userRepository.findUserById(userId);
+
+    if (!isExist) {
+      throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
+    }
+    
+    const uniqueId = generateNanoId();
+
+    const result = await uploadToCloudinary(file, "profile-picture", uniqueId);
+
+    if(isExist.profilePicture && isCloudinaryUrl(isExist.profilePicture)){
+      const publicId = getPublicIdFromUrl(isExist.profilePicture);
+      if(publicId){
+        await deleteFromCloudinary(publicId);
+      }
+    }
+
+    await this._userRepository.updateProfilePicture(userId, result.secure_url);
   }
 
 }
