@@ -6,10 +6,10 @@ type UnProtectedRouteProps = {
 };
 
 const UnProtectedRoute = ({children}: UnProtectedRouteProps) => {
-    const {isAuthenticated,user} = useAuthStore();
+    const {isAuthenticated} = useAuthStore();
 
     if (isAuthenticated) {
-        return <Navigate to={`/profile/${user?.username}`} replace/>;
+        return <Navigate to={`/activity`} replace/>;
     }
 
     return <>{children}</>;

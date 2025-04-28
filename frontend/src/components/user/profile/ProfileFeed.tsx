@@ -39,16 +39,12 @@ const ProfileFeed: FC = () => {
     setCurrentPage(page)
   }
 
-  
-
-
   return (
     <div className="my-4 lg:m-0 h-full  flex-1 max-w-[1000px] relative lg:border-x">
       <div className="flex gap-4 justify-around border-b text-gray-600 sticky top-[73px] z-20 bg-white dark:bg-black">
         {TAB_OPTIONS.map((tab) => (
-          <div className="relative">
+          <div className="relative" key={tab}>
             <button
-              key={tab}
               className={`px-5 py-2 rounded-lg text-md dark:hover:bg-neutral-500/10 hover:bg-gray-200/30 ${activeTab === tab
                 ? "font-semibold dark:text-white "
                 : "font-medium"
@@ -79,13 +75,13 @@ const ProfileFeed: FC = () => {
                       className="p-2 border-2 rounded-lg max-w-[400px] flex flex-col justify-between relative">
 
                       <Link to={`/blog/${blog._id}`}>
-                        <BlogCard blog={blog} />  
+                        <BlogCard blog={blog} />
                       </Link>
 
-                      <ViewBlogActionBar  
-                      blogId={blog?._id} 
-                      comments={blog?.comments} 
-                      upVotes={blog?.upVotes}  
+                      <ViewBlogActionBar
+                      blogId={blog?._id}
+                      comments={blog?.comments}
+                      upVotes={blog?.upVotes}
                       downVotes={blog?.downVotes}
                       hasUpVoted={blog?.hasUpVoted}
                       hasDownVoted={blog?.hasDownVoted}

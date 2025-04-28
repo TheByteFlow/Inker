@@ -6,7 +6,6 @@ import UpdateProfile from "@/components/user/editProfile/UpdateProfile";
 
 
 const EditProfile: FC = () => {
- 
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

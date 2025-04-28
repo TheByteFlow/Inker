@@ -1,12 +1,12 @@
 import {Request, Response, NextFunction} from "express";
-import {IAuthService} from "../../services/interface/IAuthService";
+import {IAuthService} from "@/services/interface/IAuthService";
 import {IAuthController} from "../interface/IAuthController";
 import {HttpStatus} from "@/constants/status.constant";
 import {HttpResponse} from "@/constants";
 import {setCookie} from "@/utils/refresh-cookie.util";
 
 export class AuthController implements IAuthController {
-    constructor(private _authService: IAuthService) {
+    constructor(private authService: IAuthService) {
     }
 
     async signup(
@@ -16,7 +16,7 @@ export class AuthController implements IAuthController {
     ): Promise<void> {
         try {
 
-            const user = await this._authService.signup(req.body);
+            const user = await this.authService.signup(req.body);
 
             res.status(HttpStatus.OK).json({
                 email: user,
@@ -35,7 +35,7 @@ export class AuthController implements IAuthController {
         try {
             const {email, username, password} = req.body;
 
-            const tokens = await this._authService.signin(email || username, password);
+            const tokens = await this.authService.signin(email || username, password);
 
             setCookie(res, tokens.refreshToken)
 
@@ -49,7 +49,7 @@ export class AuthController implements IAuthController {
         try {
             const {id_token: token} = req.body;
 
-            const {user, accessToken, refreshToken} = await this._authService.googleAuth(token);
+            const {user, accessToken, refreshToken} = await this.authService.googleAuth(token);
 
             setCookie(res, refreshToken)
 
@@ -73,7 +73,7 @@ export class AuthController implements IAuthController {
     ): Promise<void> {
         try {
             const {otp, email} = req.body;
-            const {user, accessToken, refreshToken} = await this._authService.verifyOtp(
+            const {user, accessToken, refreshToken} = await this.authService.verifyOtp(
                 otp,
                 email
             );
@@ -97,7 +97,7 @@ export class AuthController implements IAuthController {
     ): Promise<void> {
         try {
             const {email} = req.body;
-            const verifyForgotPassword = await this._authService.verifyForgotPassword(email);
+            const verifyForgotPassword = await this.authService.verifyForgotPassword(email);
             res.status(HttpStatus.OK).json(verifyForgotPassword);
 
         } catch (error) {
@@ -113,7 +113,7 @@ export class AuthController implements IAuthController {
     ): Promise<void> {
         try {
             const {password, token} = req.body;
-            const updateUserPassword = await this._authService.getResetPassword(token, password);
+            const updateUserPassword = await this.authService.getResetPassword(token, password);
             res.status(HttpStatus.OK).json(updateUserPassword)
 
         } catch (error) {
@@ -143,10 +143,12 @@ export class AuthController implements IAuthController {
         try {
             const {refreshToken} = req.cookies;
 
+            console.log("Refreshinnnng token", refreshToken)
+
             const {
                 accessToken,
                 refreshToken: newRefreshToken
-            } = await this._authService.refreshAccessToken(refreshToken);
+            } = await this.authService.refreshAccessToken(refreshToken);
 
             setCookie(res, newRefreshToken)
 
@@ -159,7 +161,7 @@ export class AuthController implements IAuthController {
     async me(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const {id} = JSON.parse(req.headers["x-user-payload"] as string)
-            const user = await this._authService.getUser(id)
+            const user = await this.authService.getUser(id)
 
             res.status(HttpStatus.OK).json(user)
         } catch (error) {

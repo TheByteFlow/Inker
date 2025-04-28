@@ -13,6 +13,8 @@ export const errorHandler = (
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message: string = HttpResponse.SERVER_ERROR;
 
+    console.log("Error Midlewrwe Error:", err);
+
     if (err instanceof HttpError) {
         statusCode = err.statusCode;
         message = err.message;

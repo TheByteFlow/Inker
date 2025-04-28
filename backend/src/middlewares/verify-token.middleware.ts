@@ -1,55 +1,50 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "@/utils/jwt.util";
-import { HttpResponse } from "@/constants/response-message.constant";
-import { HttpStatus } from "@/constants/status.constant";
-import { createHttpError } from "@/utils/http-error.util";
+import {Request, Response, NextFunction} from "express";
+import {verifyAccessToken} from "@/utils/jwt.util";
+import {HttpResponse} from "@/constants/response-message.constant";
+import {HttpStatus} from "@/constants/status.constant";
+import {createHttpError} from "@/utils/http-error.util";
 
 export default function (
-  userLevel: "user" | "admin" | "moderator"
+    userLevel: "user" | "admin" | "moderator"
 ): (req: Request, res: Response, next: NextFunction) => void {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    try {
-      const authHeader = req.headers.authorization;
+    return (req: Request, _res: Response, next: NextFunction): void => {
+        const authHeader = req.headers.authorization;
 
-      console.log("Authorization Header:", authHeader);
+        console.log("Authorization Header:", authHeader);
 
-      if (!authHeader || !authHeader.startsWith("Bearer")) {
-        throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN)
-      }
+        if (!authHeader || !authHeader.startsWith("Bearer")) {
+            throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN)
+        }
 
-      const token = authHeader.split(" ")[1];
-      if (!token) {
-        throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN)
-      }
+        const token = authHeader.split(" ")[1];
+        if (!token) {
+            throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN)
+        }
 
-      const payload = verifyAccessToken(token) as {
-        id: string;
-        email: string;
-        role: "user" | "admin" | "moderator";
-      };
+        const payload = verifyAccessToken(token) as {
+            id: string;
+            email: string;
+            role: "user" | "admin" | "moderator";
+        };
 
-      if (payload.role !== userLevel) {
-        throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.UNAUTHORIZED)
-      }
+        if (!payload) {
+            console.log("Invalid token payload");
+            throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.TOKEN_EXPIRED)
+        }
 
-      req.user = {
-        id: payload.id,
-        email: payload.email,
-        role: payload.role,
-      }
+        if (payload.role !== userLevel) {
+            throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.UNAUTHORIZED)
+        }
 
-      console.log("User payload:", req.user);
+        req.user = {
+            id: payload.id,
+            email: payload.email,
+            role: payload.role,
+        }
 
-      req.headers["x-user-payload"] = JSON.stringify(payload);
-      next();
+        console.log("User payload:", req.user);
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      if (err.name === "TokenExpiredError") {
-        throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.TOKEN_EXPIRED)
-      } else {
-        throw createHttpError(HttpStatus.FORBIDDEN, HttpResponse.TOKEN_EXPIRED)
-      }
-    }
-  };
+        req.headers["x-user-payload"] = JSON.stringify(payload);
+        next();
+    };
 }

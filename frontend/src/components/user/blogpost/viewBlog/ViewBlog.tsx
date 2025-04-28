@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import Loader from "../../common/Loader";
 import { formatBlogTimestamp } from "@/utils/formateDate";
 import ViewBlogActionBar from "./ViewBlogActionBar";
+import "./blog.css";
 
 export default function ViewBlog() {
   const { blogId } = useParams<{ blogId: string }>();
@@ -61,8 +62,7 @@ export default function ViewBlog() {
               <div className="prose prose-invert max-w-none text-foreground">
                 <MDEditor.Markdown
                   source={currentBlog.content}
-                  className="bg-transparent text-foreground"
-                  style={{ background: "transparent", color: "inherit" }}
+                  className="custom-md dark:custom-md-dark"
                 />
               </div>
               <p className="text-muted-foreground mt-4 text-sm">

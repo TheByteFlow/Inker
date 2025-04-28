@@ -2,7 +2,7 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 import {IUser} from "shared/types";
 import {AuthService} from '@/services/authServices';
-import { toast } from 'sonner';
+import {toast} from 'sonner';
 
 interface AuthState {
     user: Partial<IUser> | null
@@ -23,6 +23,7 @@ interface AuthStore extends AuthState {
     clearState: () => Promise<void>;
     refreshToken: () => Promise<string>;
     setState: (state: Partial<AuthState>) => void;
+    setHasHydrated: (hydrated: AuthStore) => Promise<void>;
     updateProfilePicture: (profilePicture: string) => void;
 
 }
@@ -33,7 +34,7 @@ export const useAuthStore = AuthStore(
     devtools(
         persist(
             function authStore(set, getState) {
-                return {    
+                return {
                     user: null,
                     accessToken: null,
                     isAuthenticated: false,
@@ -71,7 +72,7 @@ export const useAuthStore = AuthStore(
                         }
 
                         const {user, token: accessToken} = data;
-                        console.log('This sithe  AccessToken::::',accessToken)
+
                         set({
                             user,
                             accessToken,
@@ -83,7 +84,7 @@ export const useAuthStore = AuthStore(
                     register: async (name: string, email: string, password: string): Promise<boolean> => {
                         set({isLoading: true, signUpError: null});
                         const {data, error} = await AuthService.registerService({name, email, password});
-                        
+
                         if (error) {
                             set({signUpError: error, isLoading: false});
                             return false
@@ -120,7 +121,10 @@ export const useAuthStore = AuthStore(
 
                         const {data, error} = await AuthService.refreshToken();
 
+                        console.log('AuthStore: Token refreshed:', data, error);
+
                         if (error) {
+                            console.log("Referesh token error", error)
                             set({error: error, isLoading: false});
                             await getState().logout();
                             return error;
@@ -133,10 +137,7 @@ export const useAuthStore = AuthStore(
                     },
 
                     fetchUser: async () => {
-                        set({ isLoading: true, error: null});
-
                         const {data: user, error} = await AuthService.fetchUser();
-
 
                         if (error) {
                             set({error: error, isLoading: false});
@@ -151,12 +152,33 @@ export const useAuthStore = AuthStore(
                         });
                     },
 
-                    refreshUser: async () => {
-                        set({error: null, isLoading: true});
+                    setHasHydrated: async (state) => {
+                        if (state.isAuthenticated) {
+                            await getState().refreshToken();
+                            await getState().refreshUser();
+                            return;
+                        }
 
-                        const token = await getState().refreshToken();
+                        console.log('AuthStore: No user found, clearing state...');
+                        set({
+                            isLoading: false,
+                            user: null,
+                            accessToken: null,
+                            isAuthenticated: false,
+                            error: null,
+                        });
+                    },
+
+                    refreshUser: async () => {
+                        const token = getState().refreshToken;
                         if (!token) {
-                            set({isLoading: false});
+                            set({
+                                isLoading: false,
+                                user: null,
+                                accessToken: null,
+                                isAuthenticated: false,
+                                error: 'Failed to refresh token'
+                            });
                             return;
                         }
 
@@ -170,21 +192,21 @@ export const useAuthStore = AuthStore(
                     updateProfilePicture: (profilePicture: string) => {
                         set((state) => ({
                             user: state.user
-                                ? { ...state.user, profilePicture }
+                                ? {...state.user, profilePicture}
                                 : state.user,
                         }));
                     },
 
                     clearState: async () => {
-                            set({
-                                user: null,
-                                accessToken: null,
-                                isAuthenticated: false,
-                                isLoading: false,
-                                error: null,
-                                signUpError: null,
-                            });
-                        },
+                        set({
+                            user: null,
+                            accessToken: null,
+                            isAuthenticated: false,
+                            isLoading: false,
+                            error: null,
+                            signUpError: null,
+                        });
+                    },
                 };
             },
             {
@@ -192,6 +214,16 @@ export const useAuthStore = AuthStore(
                 partialize: (state) => ({
                     isAuthenticated: state.isAuthenticated,
                 }),
+                onRehydrateStorage: () => {
+                    return (state, error) => {
+                        if (error) {
+                            console.error('AuthStore: Failed to rehydrate state:', error);
+                            state?.clearState()
+                            return;
+                        }
+                        state?.setHasHydrated(state);
+                    };
+                },
             },
         ),
         {name: 'auth-store', enabled: true},

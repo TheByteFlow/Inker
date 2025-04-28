@@ -9,7 +9,7 @@ const ProtectedRoute = ({children}: ProtectedRouteProps) => {
     const {isAuthenticated} = useAuthStore();
 
     if (!isAuthenticated) {
-        return <Navigate to="/auth" replace/>;
+        return <Navigate to="/rahil" replace/>;
     }
 
     return <>{children}</>;

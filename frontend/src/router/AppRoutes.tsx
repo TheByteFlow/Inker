@@ -19,7 +19,7 @@ import UnProtectedRoute from "./UnProtectedRoutes";
 export const router = createBrowserRouter([
   { path: "/", element: <LandingPage /> },
   {
-    path: "/",
+    path: "",
     element: <AppLayout />,
     children: [
       { path: "feed", element: <ProtectedRoute><Feed/></ProtectedRoute> },

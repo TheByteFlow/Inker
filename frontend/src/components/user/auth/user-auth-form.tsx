@@ -1,9 +1,9 @@
 "use client";
 
-import { type FC, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import {type FC, useState} from "react";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
 import {
     Form,
     FormControl,
@@ -11,32 +11,32 @@ import {
     FormItem,
     FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PasswordInput } from "@/components/user/common/password-input";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
-import { Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { loginSchema, registerSchema } from "@/schemas/authSchema";
-import { Credenza, CredenzaTrigger } from "@/components/ui/credenza";
+import {Input} from "@/components/ui/input";
+import {PasswordInput} from "@/components/user/common/password-input";
+import {Button} from "@/components/ui/button";
+import {cn} from "@/lib/cn";
+import {Loader2} from "lucide-react";
+import {toast} from "sonner";
+import {useNavigate} from "react-router-dom";
+import {loginSchema, registerSchema} from "@/schemas/authSchema";
+import {Credenza, CredenzaTrigger} from "@/components/ui/credenza";
 import ForgetPassword from "./ForgetPassword";
 import useAuthStore from "@/store/authStore.ts";
 import GoogleAuth from "./GoogleAuth";
-import { Label } from "@/components/ui/label";
+import {Label} from "@/components/ui/label";
 
 // interface for Props
 interface PropsType {
     delayedAuthState: "login" | "register";
 }
 
-export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
+export const UserAuthForm: FC<PropsType> = ({delayedAuthState}) => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const formSchema =
         delayedAuthState === "login" ? loginSchema : registerSchema;
 
-    const { login, register } = useAuthStore();
+    const {login, register} = useAuthStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -55,7 +55,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                 if ("name" in data) {
                     const status = await register(data.name, data.email, data.password);
                     if (status) {
-                        navigate("/otp-verification", { state: { email: data.email } });
+                        navigate("/otp-verification", {state: {email: data.email}});
                     }
                 } else {
                     toast.error("Name is required for registration.");
@@ -82,7 +82,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                             <FormField
                                 control={form.control}
                                 name="name"
-                                render={({ field }) => (
+                                render={({field}) => (
                                     <FormItem className="space-y-1">
                                         <FormControl>
                                             <div className="flex flex-col gap-2">
@@ -97,7 +97,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                                                 />
                                             </div>
                                         </FormControl>
-                                        <FormMessage />
+                                        <FormMessage/>
                                     </FormItem>
                                 )}
                             />
@@ -107,7 +107,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                         <FormField
                             control={form.control}
                             name="email"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem className="space-y-1">
                                     <FormControl>
                                         <div className="flex flex-col gap-2">
@@ -122,7 +122,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                                             />
                                         </div>
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -131,7 +131,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                         <FormField
                             control={form.control}
                             name="password"
-                            render={({ field }) => (
+                            render={({field}) => (
                                 <FormItem className="space-y-1">
                                     <FormControl>
                                         <div className="flex flex-col gap-2">
@@ -141,7 +141,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                                             <PasswordInput placeholder="Password" {...field} />
                                         </div>
                                     </FormControl>
-                                    <FormMessage />
+                                    <FormMessage/>
                                 </FormItem>
                             )}
                         />
@@ -155,7 +155,7 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                                             Forgot Password?
                                         </button>
                                     </CredenzaTrigger>
-                                    <ForgetPassword />
+                                    <ForgetPassword/>
                                 </Credenza>
                             </div>
                         )}
@@ -163,13 +163,13 @@ export const UserAuthForm: FC<PropsType> = ({ delayedAuthState }) => {
                         {/* Buttons */}
                         <div className="flex flex-col gap-2">
                             <Button className="mt-2" disabled={isLoading} type="submit">
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                                 {delayedAuthState === "login" ? "Sign In" : "Sign Up"}
                             </Button>
 
                             {/* Google auth */}
                             <div className="flex gap-2 flex-col">
-                                <GoogleAuth />
+                                <GoogleAuth/>
                             </div>
                         </div>
                     </div>

@@ -5,7 +5,6 @@ import {HttpStatus} from "@/constants/status.constant";
 import {HttpResponse} from "@/constants/response-message.constant";
 import {IUserModel} from "@/models/implementation/user.model";
 import {generateNanoId} from "@/utils/generate-nanoid";
-import {JwtPayload} from "jsonwebtoken";
 import {
     comparePassword,
     generateAccessToken,
@@ -20,22 +19,20 @@ import {
 import {redisClient} from "@/configs";
 import {IUser} from "shared/types";
 import fetchGoogleUser from "@/utils/google-auth";
+import {AuthJwtPayload} from "@/types/jwt-payload";
 
-
-//!   Implementation for Auth Service
 export class AuthService implements IAuthService {
-    constructor(private readonly _userRepository: IUserRepository) {
+    constructor(private readonly userRepository: IUserRepository) {
     }
 
     async signup(
         user: IUser
     ): Promise<string> {
-        const userExist = await this._userRepository.findByEmail(user.email);
+        const userExist = await this.userRepository.findByEmail(user.email);
 
         if (userExist) {
             throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_EXIST);
         }
-
 
         const otp = generateOTP();
 
@@ -62,7 +59,7 @@ export class AuthService implements IAuthService {
         identifier: string,
         password: string
     ): Promise<{ accessToken: string; refreshToken: string }> {
-        const user = await this._userRepository.findOneWithUsernameOrEmail(identifier);
+        const user = await this.userRepository.findOneWithUsernameOrEmail(identifier);
 
         if (!user) {
             throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
@@ -74,7 +71,7 @@ export class AuthService implements IAuthService {
             throw createHttpError(HttpStatus.BAD_REQUEST, HttpResponse.PASSWORD_INCORRECT);
         }
 
-        const payload = {id: user._id, role: user.role, username: user.username};
+        const payload = {id: user._id, role: user.role, username: user.username} as AuthJwtPayload;
 
         const accessToken = generateAccessToken(payload);
         const refreshToken = generateRefreshToken(payload);
@@ -83,14 +80,13 @@ export class AuthService implements IAuthService {
     }
 
     async googleAuth(token: string): Promise<{ accessToken: string; refreshToken: string, user: IUserModel }> {
-        // fetch the user details from the Google api
         const googleUser = await fetchGoogleUser(token);
         if (!googleUser) {
             throw new Error('Invalid credentials');
         }
 
         console.log("Google user details:", JSON.stringify(googleUser));
-        const userExist = await this._userRepository.findByEmail(googleUser.email);
+        const userExist = await this.userRepository.findByEmail(googleUser.email);
 
         if (userExist) {
             const payload = {id: userExist._id, role: userExist.role, username: userExist.username};
@@ -110,7 +106,7 @@ export class AuthService implements IAuthService {
             password: "fghjkl;lkjhgfcdfghj",
         };
 
-        const createdUser = await this._userRepository.create(user as IUserModel);
+        const createdUser = await this.userRepository.create(user as IUserModel);
 
         if (!createdUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_CREATION_FAILED);
 
@@ -144,7 +140,7 @@ export class AuthService implements IAuthService {
             password: storedData.password,
         };
 
-        const createdUser = await this._userRepository.create(user as IUserModel);
+        const createdUser = await this.userRepository.create(user as IUserModel);
 
         if (!createdUser) throw createHttpError(HttpStatus.CONFLICT, HttpResponse.USER_CREATION_FAILED);
 
@@ -162,7 +158,7 @@ export class AuthService implements IAuthService {
     async verifyForgotPassword(
         email: string
     ): Promise<{ status: number; message: string }> {
-        const isExist = await this._userRepository.findByEmail(email);
+        const isExist = await this.userRepository.findByEmail(email);
 
         if (!isExist) {
             throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND);
@@ -194,7 +190,7 @@ export class AuthService implements IAuthService {
 
         const hashedPassword = await hashPassword(password);
 
-        const updateUser = await this._userRepository.updatePassword(getEmail, hashedPassword);
+        const updateUser = await this.userRepository.updatePassword(getEmail, hashedPassword);
         if (!updateUser) {
             throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, HttpResponse.SERVER_ERROR);
         }
@@ -212,25 +208,26 @@ export class AuthService implements IAuthService {
         token: string
     ) {
 
+        console.log("Token:", token);
+
         if (!token) {
-            throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.NO_TOKEN);
+            throw createHttpError(HttpStatus.UNAUTHORIZED, HttpResponse.NO_TOKEN);
         }
 
-        const decoded = verifyRefreshToken(token) as JwtPayload;
+        const decoded = verifyRefreshToken(token) as AuthJwtPayload;
+
         if (!decoded) {
             throw createHttpError(HttpStatus.NO_CONTENT, HttpResponse.TOKEN_EXPIRED);
         }
 
-        const payload = {id: decoded.id, role: decoded.role, username: decoded.username};
-
-        const accessToken = generateAccessToken(payload);
-        const refreshToken = generateRefreshToken(payload)
+        const accessToken = generateAccessToken({id: decoded.id, role: decoded.role, username: decoded.username});
+        const refreshToken = generateRefreshToken({id: decoded.id, role: decoded.role, username: decoded.username});
 
         return {accessToken, refreshToken};
     }
 
     async getUser(userId: string): Promise<IUserModel> {
-        const user = await this._userRepository.findUserById(userId)
+        const user = await this.userRepository.findUserById(userId)
 
         if (!user) {
             throw createHttpError(HttpStatus.NOT_FOUND, HttpResponse.USER_NOT_FOUND)
