@@ -5,7 +5,7 @@ export const toPlainObject = <T>(data: T): T => {
     "toObject" in data &&
     typeof data.toObject == "function"
   ) {
-    return (data as any).toObject();
+    return data.toObject();
   }
   return data;
 };
