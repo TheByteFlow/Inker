@@ -8,3 +8,4 @@ export { checkEmailExistence } from "./email-verification.utils";
 export { toObjectId } from "./convert-object-id.utils";
 export { generateUniqueUsername } from "./generate-uniq-username";
 export { uploadToCloudinary, generateSignedUrl } from "./cloudinary.util";
+export { toPlainObject , omitFields } from './object.util'
