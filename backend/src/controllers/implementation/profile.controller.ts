@@ -3,6 +3,7 @@ import { IProfileController } from "../interface/IProfileController";
 import { HttpStatus } from "@/constants/status.constant";
 import { HttpResponse } from "@/constants/response-message.constant";
 import { IProfileService } from "@/services/interface/IProfileService";
+import { userDataMapper } from "@/mappers/user.mapper";
 
 export class ProfileController implements IProfileController {
   constructor(private readonly _profileService: IProfileService) { }
@@ -15,12 +16,12 @@ export class ProfileController implements IProfileController {
     try {
       const { username } = req.params
 
-      const profileDetails = await this._profileService.getProfile(username);
-      res.status(HttpStatus.OK).json({ message: HttpResponse.RESOURCE_FOUND, profileDetails })
+      const profileDetails = await this._profileService.getProfile(username); 
+      res.status(HttpStatus.OK).json({ message: HttpResponse.RESOURCE_FOUND, profileDetails  : userDataMapper(profileDetails)})
     } catch (err) {
       next(err);
     }
-  }
+  } 
 
 
   async editUsername(
@@ -50,7 +51,7 @@ export class ProfileController implements IProfileController {
       const updateData = req.body
       const updatedData = await this._profileService.updateProfile(id, updateData)
 
-      res.status(HttpStatus.OK).json({ message: HttpResponse.RESOURCE_UPDATED, updatedData })
+      res.status(HttpStatus.OK).json({ message: HttpResponse.RESOURCE_UPDATED, updatedData :userDataMapper(updatedData)})
     } catch (error) {
       next(error)
     }

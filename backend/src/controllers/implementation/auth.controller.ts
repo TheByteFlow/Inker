@@ -4,6 +4,7 @@ import {IAuthController} from "../interface/IAuthController";
 import {HttpStatus} from "@/constants/status.constant";
 import {HttpResponse} from "@/constants";
 import {setCookie} from "@/utils/refresh-cookie.util";
+import { userDataMapper } from "@/mappers/user.mapper";
 
 export class AuthController implements IAuthController {
     constructor(private authService: IAuthService) {
@@ -57,7 +58,7 @@ export class AuthController implements IAuthController {
 
             res.status(HttpStatus.OK).json({
                 message: HttpResponse.GOOGLE_LOGIN_SUCCESS,
-                user,
+                user :userDataMapper(user),
                 token: accessToken
             });
         } catch (err) {
@@ -78,10 +79,10 @@ export class AuthController implements IAuthController {
                 email
             );
             setCookie(res, refreshToken)
-
+   
             res.status(HttpStatus.CREATED).json({
                 message: HttpResponse.USER_CREATION_SUCCESS,
-                user,
+                user : userDataMapper(user),
                 token: accessToken
             });
         } catch (err) {
@@ -162,8 +163,8 @@ export class AuthController implements IAuthController {
         try {
             const {id} = JSON.parse(req.headers["x-user-payload"] as string)
             const user = await this.authService.getUser(id)
-
-            res.status(HttpStatus.OK).json(user)
+            const mappedUser = userDataMapper(user) 
+            res.status(HttpStatus.OK).json(mappedUser)
         } catch (error) {
             next(error)
         }
